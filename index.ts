@@ -4,14 +4,11 @@ import express from "express";
 import "express-async-errors";
 import { BotController } from "./controllers";
 import http from "http";
-import { initSocket } from "./sockets/socket.server";
 dotenv.config();
 
 const PORT = process.env.PORT || 2800;
 const app = express();
 const server = http.createServer(app);
-
-initSocket(server);
 
 //middlewares
 const allowedOriginPatterns = [/http:\/\/localhost:3000$/];
@@ -37,6 +34,5 @@ app.use(cors(corsOptions));
 server.listen(PORT, () => {
   // start the bot
   const bot = new BotController();
-  console.log(`Server running on port ${PORT}`);
   bot.listen();
 });
