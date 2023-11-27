@@ -6,7 +6,7 @@ import express from "express";
 import "express-async-errors";
 import morgan from "morgan";
 import { useErrorHandler, useNotFound, useRateLimiter } from "./middlewares/";
-import { connectToDb } from "./utils";
+import { BotController } from "./controllers";
 import http from "http";
 import { initSocket } from "./sockets/socket.server";
 import { helloRouter } from "./routes";
@@ -51,6 +51,8 @@ app.use(useNotFound);
 app.use(useErrorHandler);
 
 server.listen(PORT, () => {
+  // start the bot
+  const bot = new BotController();
+  bot.listen();
   console.log(`Server running on port ${PORT}`);
-  //connectToDb();
 });
