@@ -18,8 +18,18 @@ class BotController {
     this.bot.on("message", (msg) => {
       console.log(msg);
       const chatId = msg.chat.id;
+      const userId = msg.from?.id;
+      const isBot = msg.from?.is_bot;
 
-      console.log(chatId);
+      console.log(`Chat Is is ${chatId} and Message Id is ${chatId}`);
+      this.bot.sendMessage(
+        chatId,
+        `Hello ${msg.from?.first_name} I'm Kegha bot, nice to meet you`
+      );
+      this.bot.sendMessage(
+        chatId,
+        `I can securely links Telegram accounts to BOS profiles, offering a seamless and effortless user identification experience.`
+      );
     });
   }
 }
