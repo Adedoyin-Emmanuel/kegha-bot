@@ -1,20 +1,16 @@
-import bodyParser from "body-parser";
-import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import "express-async-errors";
-import morgan from "morgan";
-import { useErrorHandler, useNotFound, useRateLimiter } from "./middlewares/";
 import { BotController } from "./controllers";
 import http from "http";
 import { initSocket } from "./sockets/socket.server";
-import { helloRouter } from "./routes";
 dotenv.config();
 
 const PORT = process.env.PORT || 2800;
 const app = express();
 const server = http.createServer(app);
+
 initSocket(server);
 
 //middlewares
@@ -37,22 +33,10 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(cookieParser());
-app.use(bodyParser.json({ limit: "100mb" }));
-app.use(morgan("dev"));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(useRateLimiter);
-
 //endpoints
-
-app.use("/api", helloRouter);
-
-app.use(useNotFound);
-app.use(useErrorHandler);
-
 server.listen(PORT, () => {
   // start the bot
   const bot = new BotController();
-  bot.listen();
   console.log(`Server running on port ${PORT}`);
+  bot.listen();
 });
