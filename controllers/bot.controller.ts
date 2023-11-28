@@ -1,5 +1,5 @@
-import { first } from "lodash";
 import TelegramBot from "node-telegram-bot-api";
+import * as near from "near-api-js";
 
 class BotController {
   /*
@@ -8,9 +8,41 @@ class BotController {
 
   */
   protected bot: TelegramBot;
+
   constructor() {
     const telegramToken: any = process.env.TELEGRAM_TOKEN;
     this.bot = new TelegramBot(telegramToken, { polling: true });
+  }
+
+  private async initNear(bot: TelegramBot, chatId: number) {
+    const nearPrivateKey: any = process.env.NEAR_PRIVATE_KEY;
+    const { keyStores, KeyPair } = near;
+    const myKeyStore = new keyStores.InMemoryKeyStore();
+    const keyPair = KeyPair.fromString(nearPrivateKey);
+
+    const initMyKeyStore = async () => {
+      await myKeyStore.setKey("testnet", "example-account.testnet", keyPair);
+    };
+
+    initMyKeyStore();
+    const connectionConfig = {
+      networkId: "testnet",
+      keyStore: myKeyStore,
+      nodeUrl: "https://rpc.testnet.near.org",
+      walletUrl: "https://wallet.testnet.near.org",
+      helperUrl: "https://helper.testnet.near.org",
+      explorerUrl: "https://explorer.testnet.near.org",
+    };
+
+    const connection = await near.connect(connectionConfig);
+    const account = await connection.account("emmysoft.testnet");
+
+    bot.sendMessage(
+      chatId,
+      `Hi ${
+        account.accountId
+      } 👋, you've 💰${await account.getAccountBalance()} `
+    );
   }
 
   private handleCommand(
@@ -20,6 +52,10 @@ class BotController {
   ): void {
     switch (command) {
       case "/start":
+        this.initNear(this.bot, chatId);
+        break;
+
+      case "/about":
         this.bot.sendMessage(
           chatId,
           `Hello ${msg.from?.first_name} I'm Kegha bot 👋, nice to meet you`
@@ -37,8 +73,10 @@ class BotController {
             reply_markup: {
               keyboard: [
                 [{ text: "/start" }],
+                [{ text: "/about" }],
                 [{ text: "/help" }],
                 [{ text: "/map" }],
+                [{ text: "/account" }],
               ],
             },
           }
@@ -69,7 +107,13 @@ class BotController {
 
       // check if the user sends a message
       if (msg.text && msg.text.startsWith("/")) {
-        const availableCommands = ["/start", "/help", "/map"];
+        const availableCommands = [
+          "/start",
+          "/help",
+          "/map",
+          "/about",
+          "/account",
+        ];
         const command = msg.text.split(" ")[0];
 
         if (availableCommands.includes(command)) {
