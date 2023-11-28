@@ -36,12 +36,13 @@ class BotController {
 
     const connection = await near.connect(connectionConfig);
     const account = await connection.account("emmysoft.testnet");
+    const balance = await account.getAccountBalance();
+    const accountDetails = await account.getAccountDetails();
+    console.log(account);
 
     bot.sendMessage(
       chatId,
-      `Hi ${
-        account.accountId
-      } 👋, you've 💰${await account.getAccountBalance()} `
+      `Hi ${account.accountId} 👋, you've 💰 ${balance.available} $NEAR Testnet Funds`
     );
   }
 
@@ -83,7 +84,7 @@ class BotController {
         );
         break;
       case "/map":
-        this.bot.sendMessage(chatId, "Mapping in progress...");
+        this.bot.sendMessage(chatId, "Working on the mapping feature 🚧");
         break;
       default:
         // catches commands that are not available
