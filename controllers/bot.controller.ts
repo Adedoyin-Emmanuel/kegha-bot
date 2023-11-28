@@ -1,37 +1,33 @@
-import TelegramBot from "node-telegram-bot-api";
+import { Telegraf } from "telegraf";
 import * as near from "near-api-js";
-
-interface keghaContractInterface extends near.Contract {
-  get_greeting?: () => Promise<any>;
-  set_greeting?: (arg_name: any) => Promise<void>;
-}
+// import { KeyPair } from "@near-js/crypto";
+// import { InMemoryKeyStore } from "@near-js/keystores";
+// import { actionCreators } from "@near-js/transactions";
+// import BN from "bn.js";
 
 class BotController {
-  /*
-     @route GET /bot/
-    Sends hello to client 
-
-  */
-  protected bot: TelegramBot;
-  protected contract: keghaContractInterface;
+  protected bot: Telegraf;
+  protected account: near.Account;
+  protected contract: near.Contract | any;
+  protected nearUsername: string;
 
   constructor() {
     const telegramToken: any = process.env.TELEGRAM_TOKEN;
-    this.bot = new TelegramBot(telegramToken, { polling: true });
-    this.contract = {} as keghaContractInterface;
+    this.bot = new Telegraf(telegramToken);
+    this.account = {} as near.Account;
+    this.contract = {} as near.Contract | any;
+    this.nearUsername = "" as string;
   }
 
-  private async initNear(bot: TelegramBot, chatId: number) {
+  async listen() {
+    console.log("Kegha Bot is listening 🚀");
+
     const nearPrivateKey: any = process.env.NEAR_PRIVATE_KEY;
     const { keyStores, KeyPair } = near;
     const myKeyStore = new keyStores.InMemoryKeyStore();
     const keyPair = KeyPair.fromString(nearPrivateKey);
 
-    const initMyKeyStore = async () => {
-      await myKeyStore.setKey("testnet", "example-account.testnet", keyPair);
-    };
-
-    initMyKeyStore();
+    await myKeyStore.setKey("testnet", "emmysoft.testnet", keyPair);
     const connectionConfig = {
       networkId: "testnet",
       keyStore: myKeyStore,
@@ -42,144 +38,148 @@ class BotController {
     };
 
     const connection = await near.connect(connectionConfig);
-    const account = await connection.account("emmysoft.testnet");
-    const balance = await account.getAccountBalance();
-    const accountDetails = await account.getAccountDetails();
 
-    this.contract = new near.Contract(
-      account,
-      "dev-1701155750174-91796561057790",
-      {
-        viewMethods: ["get_greeting"],
-        changeMethods: ["set_greeting"],
-      }
-    );
-
-    this.contract.get_greeting = async (): Promise<any> => {
-      const response = await this.contract.get_greeting!();
-      return response;
-    };
-
-    bot.sendMessage(
-      chatId,
-      `Hi ${account.accountId} 👋, you've 💰 ${balance.available} $NEAR Testnet Funds`
-    );
-  }
-
-  private async getGreeting(bot: TelegramBot, chatId: number) {
-    const response = await this.contract.get_greeting!();
-    bot.sendMessage(chatId, `The current greeting is "${response}"`);
-  }
-
-  private async setGreeting(
-    bot: TelegramBot,
-    chatId: number,
-    greeting: string
-  ) {
-    await this.contract.set_greeting!({ arg_name: greeting });
-    bot.sendMessage(chatId, `The greeting was updated to "${greeting}"`);
-  }
-
-  private handleCommand(
-    command: string,
-    msg: TelegramBot.Message,
-    chatId: number
-  ): void {
-    switch (command) {
-      case "/start":
-        this.initNear(this.bot, chatId);
-        break;
-
-      case "/set-greeting":
-        console.log(command);
-        console.log(msg);
-        //this.setGreeting(this.bot, chatId, );
-        break;
-
-      case "/get-greeting":
-        this.getGreeting(this.bot, chatId);
-        break;
-
-      case "/about":
-        this.bot.sendMessage(
-          chatId,
-          `Hello ${msg.from?.first_name} I'm Kegha bot 👋, nice to meet you`
-        );
-        this.bot.sendMessage(
-          chatId,
-          `I can securely links Telegram accounts to BOS profiles, offering a seamless and effortless user identification experience.`
-        );
-        break;
-      case "/help":
-        this.bot.sendMessage(
-          chatId,
-          "Sure! Here are some available commands:\n/start - Start the bot\n/help - Display help",
-          {
-            reply_markup: {
-              keyboard: [
-                [{ text: "/start" }],
-                [{ text: "/about" }],
-                [{ text: "/help" }],
-                [{ text: "/map" }],
-                [{ text: "/account" }],
-                [{ text: "/set-greeting" }],
-                [{ text: "/get-greeting" }],
-              ],
-            },
-          }
-        );
-        break;
-      case "/map":
-        this.bot.sendMessage(chatId, "Working on the mapping feature 🚧");
-        break;
-      default:
-        // catches commands that are not available
-        this.bot.sendMessage(
-          chatId,
-          `Sorry, ${msg.from?.first_name} that command doesn't exist 😥. Here are some available commands:\n/start - Start the bot\n/help - Display help`
-        );
-        break;
-    }
-  }
-
-  //listens to request made to /bot
-  async listen() {
-    console.log("Kegha Bot is listening 🚀...");
-    this.bot.on("message", (msg) => {
-      console.log(msg);
-      const chatId = msg.chat.id;
-      const userId = msg.from?.id;
-      const isBot = msg.from?.is_bot;
-      const firstName = msg.from?.first_name;
-
-      // check if the user sends a message
-      if (msg.text && msg.text.startsWith("/")) {
-        const availableCommands = [
-          "/start",
-          "/help",
-          "/map",
-          "/about",
-          "/account",
-          "/set-greeting",
-          "/get-greeting",
-        ];
-        const command = msg.text.split(" ")[0];
-
-        if (availableCommands.includes(command)) {
-          this.handleCommand(command, msg, chatId);
+    this.bot.command("start", async (ctx) => {
+      console.log(ctx);
+      const firstName = ctx.from.first_name;
+      ctx.reply(`Hi ${firstName}! Welcome to Kegha Bot 👋.`);
+      await ctx.reply("Please enter your near id");
+      this.bot.hears([/./], async (ctx) => {
+        console.log(ctx.message.text);
+        // if (!/^[a-zA-Z0-9._-]+$/.test(ctx.message.text)) {
+        //   return ctx.reply(
+        //     "Invalid NEAR username. Please enter a valid username."
+        //   );
+        // }
+        this.account = await connection.account(`${ctx.message.text}.testnet`);
+        if (!this.account) {
+          ctx.reply("Please enter your near id");
         } else {
-          this.bot.sendMessage(
-            chatId,
-            `Sorry, ${msg.from?.first_name} that command doesn't exist 😥. Here are some available commands:\n/start - Start the bot\n/help - Display help`
+          this.nearUsername = ctx.message.text;
+          ctx.reply(
+            `You're logged in as ${this.account.accountId} 🚀, you've 💰 ${
+              (await this.account.getAccountBalance()).available
+            }`
           );
         }
-      } else {
-        this.bot.sendMessage(
-          chatId,
-          `Sorry, ${firstName} that's not a valid command 😏, \n/help - Display help`
+      });
+    });
+    this.bot.command("get", async (ctx) => {
+      try {
+        if (!this.nearUsername) {
+          return ctx.reply("Please login first");
+        }
+
+        // Initialize the contract
+        this.contract = await new near.Contract(
+          this.account,
+          "v1.social08.testnet",
+          {
+            changeMethods: ["set"],
+            viewMethods: ["get"],
+          }
         );
+
+        // Retrieve the profile
+        const profile = await this.contract.get({
+          keys: [`${this.nearUsername}.testnet/profile/**`],
+        });
+
+        // Log the retrieved profile
+        console.log("Retrieved Profile:", profile);
+
+        // Respond to the user with the retrieved profile data
+        ctx.reply(`Retrieved Profile: ${JSON.stringify(profile)}`);
+      } catch (error) {
+        console.error("Error during profile retrieval:", error);
+        ctx.reply("Error retrieving profile. Please try again.");
       }
     });
+
+    this.bot.command("set", async (ctx) => {
+      if (!this.nearUsername) {
+        return ctx.reply("Please login first");
+      }
+
+      // const keyStore = new InMemoryKeyStore();
+      // const privateKey = process.env.NEAR_PRIVATE_KEY as string;
+      // await keyStore.setKey(
+      //   process.env.NEXT_PUBLIC_NETWORK_ID as string,
+      //   this.nearUsername,
+      //   KeyPair.fromString(privateKey)
+      // );
+
+      // const signerAccount = await (this.nearUsername,
+      // keyStore,
+      // process.env.NEXT_PUBLIC_NETWORK_ID as string);
+      // const gas = "300000000000000";
+      // const deposit = "50000000000000000000000";
+
+      // const args: any = {
+      //   data: {
+      //     [this.nearUsername]: {
+      //       profile: {
+      //         name: "Emmysoft",
+      //         description: "I love coding",
+      //         linktree: {
+      //           telegram: "Dev",
+      //         },
+      //         image: {
+      //           ipfs_cid:
+      //             "https://avatars.githubusercontent.com/u/88517758?v=4",
+      //         },
+      //         tags: {
+      //           dropwallet: "",
+      //           near: "",
+      //           genadrop: "",
+      //         },
+      //       },
+      //     },
+      //   },
+      // };
+
+      // const action = actionCreators.functionCall(
+      //   "set",
+      //   args,
+      //   new BN(gas),
+      //   new BN(deposit)
+      // );
+
+      this.contract = await new near.Contract(
+        this.account,
+        "v1.social08.testnet",
+        {
+          changeMethods: ["set"],
+          viewMethods: ["get"],
+        }
+      );
+      const gas = "300000000000000";
+      const deposit = "50000000000000000000000";
+      //const username = `${this.nearUsername}.testnet`;
+      try {
+        const profile = await this.contract.set({
+          args: {
+            data: {
+              "emmysoft.testnet": {
+                profile: {
+                  name: "Adedoyin Emmanuel",
+                  image: {
+                    url: "https://avatars.githubusercontent.com/u/88517758?v=4",
+                  },
+                },
+              },
+            },
+          },
+          gas: "300000000000000",
+          amount: "1000000000000000000000000",
+        });
+        console.log(profile);
+      } catch (error) {
+        console.error("Error during contract set:", error);
+      }
+    });
+
+    this.bot.launch();
   }
 }
 
