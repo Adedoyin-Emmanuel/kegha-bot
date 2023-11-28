@@ -32,15 +32,23 @@ class BotController {
       case "/help":
         this.bot.sendMessage(
           chatId,
-          "Sure! Here are some available commands:\n/start - Start the bot\n/help - Display help"
+          "Sure! Here are some available commands:\n/start - Start the bot\n/help - Display help",
+          {
+            reply_markup: {
+              keyboard: [
+                [{ text: "/start" }],
+                [{ text: "/help" }],
+                [{ text: "/map" }],
+              ],
+            },
+          }
         );
         break;
       case "/map":
-        // Add your logic for mapping here
         this.bot.sendMessage(chatId, "Mapping in progress...");
         break;
       default:
-        // Handle other commands as needed
+        // catches commands that are not available
         this.bot.sendMessage(
           chatId,
           `Sorry, ${msg.from?.first_name} that command doesn't exist 😥. Here are some available commands:\n/start - Start the bot\n/help - Display help`
