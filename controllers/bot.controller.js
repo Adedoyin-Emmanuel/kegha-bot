@@ -2,21 +2,21 @@ const near = require("near-api-js");
 const { keyStores, KeyPair } = near;
 const myKeyStore = new keyStores.InMemoryKeyStore();
 const { generateSeedPhrase } = require("near-seed-phrase");
-const { Telegraf } = require("telegraf");
+const { Telegraf, Markup } = require("telegraf");
 
 const { seedPhrase, publicKey, secretKey } = generateSeedPhrase();
-const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
+const bot = new Telegraf("6730224944:AAFjQFzSw2jc5yLmzXs5UuZfrJZ3LQVQfE0");
+const network = "testnet";
 class BotController {
-  constructor() {
-    this.network = "testnet";
-  }
+  constructor() {}
 
   async listen() {
     console.log("Kegha bot started 🚀");
+    this.network = network;
     await myKeyStore.setKey(
       this.network,
       "emmysoft.testnet",
-      process.env.NEAR_PRIVATE_KEY
+      "ed25519:4pdBpBMMJR86i6rtjBA6hVEi2wbJ7hHnaKsK7m77T4ogP7itk82EMGdjWXdwYhgnHaTFL96E5gA5QFW2q2MmX6XC"
     );
     const connectionConfig = {
       networkId: this.network,
@@ -31,7 +31,7 @@ class BotController {
 
     bot.command("start", (ctx) => {
       ctx.reply(
-        "Hi! Welcome to Kegha 👋. Let me walk you through the process of creating your near wallet 🚀. Please enter a username you'd like to use"
+        "Welcome to Kegha 👋. Let me walk you through the process of creating your near wallet 🚀. Please enter a username you'd like to use"
       );
 
       bot.hears([/./], async (ctx) => {
@@ -50,7 +50,7 @@ class BotController {
 
         try {
           const args = {
-            new_account_id: this.nearUsername,
+            new_account_id: this.nearUsername.toLowerCase(),
             new_public_key: publicKey,
           };
 
@@ -66,7 +66,25 @@ class BotController {
             ],
           });
           console.log(result);
-          ctx.reply("Your wallet has been created successfully 🚀");
+          ctx.replyWithHTML(
+            `Your wallet has been created successfully 🚀 You are logged in as <b>${this.nearUsername} ✅</b>`,
+            Markup.inlineKeyboard([
+              [
+                Markup.button.url(
+                  "View wallet 👜",
+                  `https://explorer.testnet.near.org/accounts/${this.nearUsername}`
+                ),
+              ],
+              [
+                Markup.button.callback("Check Balance 💰", "check_balance"),
+                Markup.button.callback("Help ❓", "help"),
+              ],
+              [
+                Markup.button.callback("Update Profile 🧑", "update_profile"),
+                Markup.button.callback("View Profile 🧑", "view_profile"),
+              ],
+            ])
+          );
         } catch (error) {
           console.log(`An error occured 😞 ${error.message}`);
         }
