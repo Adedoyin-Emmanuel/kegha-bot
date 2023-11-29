@@ -5,44 +5,7 @@ const { generateSeedPhrase } = require("near-seed-phrase");
 const { Telegraf } = require("telegraf");
 
 const { seedPhrase, publicKey, secretKey } = generateSeedPhrase();
-const bot = new Telegraf("6730224944:AAFjQFzSw2jc5yLmzXs5UuZfrJZ3LQVQfE0");
-
-// const run = async () => {
-//   await myKeyStore.setKey(
-//     "testnet",
-//     "emmysoft.testnet",
-//     "ed25519:4pdBpBMMJR86i6rtjBA6hVEi2wbJ7hHnaKsK7m77T4ogP7itk82EMGdjWXdwYhgnHaTFL96E5gA5QFW2q2MmX6XC"
-//   );
-//   const connectionConfig = {
-//     networkId: "testnet",
-//     keyStore: myKeyStore,
-//     nodeUrl: "https://rpc.testnet.near.org",
-//     walletUrl: "https://wallet.testnet.near.org",
-//     helperUrl: "https://helper.testnet.near.org",
-//     explorerUrl: "https://explorer.testnet.near.org",
-//   };
-//   const connection = await near.connect(connectionConfig);
-//
-//   const account = await connection.account("emmysoft.testnet");
-//   const args = {
-//     new_account_id: "dsgksdgklsdg.testnet",
-//     new_public_key: publicKey,
-//   };
-
-//   const result = await account.signAndSendTransaction({
-//     receiverId: "testnet",
-//     actions: [
-//       near.transactions.functionCall(
-//         "create_account",
-//         Buffer.from(JSON.stringify(args)),
-//         "30000000000000",
-//         "30000000000000000000000"
-//       ),
-//     ],
-//   });
-//   console.log(result);
-// };
-
+const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
 class BotController {
   constructor() {
     this.network = "testnet";
@@ -51,17 +14,17 @@ class BotController {
   async listen() {
     console.log("Kegha bot started 🚀");
     await myKeyStore.setKey(
-      "testnet",
+      this.network,
       "emmysoft.testnet",
-      "ed25519:4pdBpBMMJR86i6rtjBA6hVEi2wbJ7hHnaKsK7m77T4ogP7itk82EMGdjWXdwYhgnHaTFL96E5gA5QFW2q2MmX6XC"
+      process.env.NEAR_PRIVATE_KEY
     );
     const connectionConfig = {
-      networkId: "testnet",
+      networkId: this.network,
       keyStore: myKeyStore,
-      nodeUrl: "https://rpc.testnet.near.org",
-      walletUrl: "https://wallet.testnet.near.org",
-      helperUrl: "https://helper.testnet.near.org",
-      explorerUrl: "https://explorer.testnet.near.org",
+      nodeUrl: `https://rpc.${this.network}.near.org`,
+      walletUrl: `https://wallet.${this.network}.near.org`,
+      helperUrl: `https://helper.${this.network}.near.org`,
+      explorerUrl: `https://explorer.${this.network}.near.org`,
     };
     const connection = await near.connect(connectionConfig);
     const account = await connection.account("emmysoft.testnet");
