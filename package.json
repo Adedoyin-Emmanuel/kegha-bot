@@ -1,47 +1,17 @@
 {
-  "name": "nodejs-template",
+  "name": "kegha2",
   "version": "1.0.0",
-  "description": "A simple nodejs template for building nodejs applications",
-  "main": "./dist/index.js",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "lint": "eslint .",
-    "check-lint": "eslint [0-9]*.ts",
-    "build": "rimraf ./dist && tsc index.ts --esModuleInterop true --target ES6 --module nodenext --moduleResolution nodenext --outDir dist",
-    "start": "npm run build && node ./dist/index.js",
-    "dev": "nodemon index.ts",
-    "test": "jest",
-    "full-test": "eslint */[0-9]*.ts && jest --watchAll --verbose",
-    "full-test-fix": "eslint */[0-9]*.ts --fix && jest --watchAll --verbose"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "proxy": true,
   "keywords": [],
-  "author": "Adedoyin Emmanuel Adeniyi",
-  "license": "MIT",
-  "devDependencies": {
-    "@babel/core": "^7.6.0",
-    "@babel/node": "^7.8.0",
-    "@babel/preset-env": "^7.6.0",
-    "@types/morgan": "^1.9.6",
-    "@types/node": "^20.7.1",
-    "eslint": "^6.4.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-jest": "^22.17.0",
-    "nodemon": "^3.0.1",
-    "typescript": "^5.2.2"
-  },
-  "engines": {
-    "node": "18.18.0"
-  },
   "dependencies": {
-    "@keypom/core": "^1.0.2",
-    "build": "^0.1.4",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
     "near-api-js": "^2.1.4",
     "near-seed-phrase": "^0.2.0",
-    "rimraf": "^5.0.5",
-    "telegraf": "^4.15.0",
-    "ts-node": "^10.9.1"
-  }
+    "telegraf": "^4.15.0"
+  },
+  "author": "",
+  "license": "ISC"
 }
