@@ -47,6 +47,19 @@ class BotController {
     ]);
   }
 
+  viewUpdateProfile() {
+    return Markup.inlineKeyboard([
+      [Markup.button.callback("Back ⬅️", "back")],
+      [Markup.button.callback("View Profile 🧑", "view_profile")],
+      [
+        Markup.button.url(
+          "View profile on Meteor Wallet 👜",
+          "https://wallet.meteorwallet.app/wallet/settings/profile"
+        ),
+      ],
+    ]);
+  }
+
   async listen() {
     console.log("Kegha bot started 🚀");
     this.network = network;
@@ -236,14 +249,7 @@ class BotController {
                 });
                 ctx.reply(
                   "Profile name updated successfully 🚀",
-                  Markup.inlineKeyboard([
-                    [Markup.button.callback("Back ⬅️", "back")][
-                      Markup.button.callback("View Profile 🧑", "view_profile")
-                    ][
-                      (Markup.button.url("View profile on Meteor Wallet 👜"),
-                      "https://wallet.meteorwallet.app/wallet/settings/profile")
-                    ],
-                  ])
+                  this.viewUpdateProfile()
                 );
               } catch (error) {
                 console.log(error);
@@ -360,6 +366,14 @@ class BotController {
                   "https://near.social"
                 ),
               ],
+
+              [
+                Markup.button.url(
+                  "View profile on Meteor Wallet 👜",
+                  "https://wallet.meteorwallet.app/wallet/settings/profile"
+                ),
+              ],
+
               [Markup.button.callback("Back ⬅️", "back")],
             ])
           );
