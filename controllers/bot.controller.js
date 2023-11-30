@@ -266,7 +266,37 @@ class BotController {
               const profileUpdate = {
                 about: ctx.match[1],
               };
+
               console.log(profileUpdate);
+
+              try {
+                const account = await connection.account(this.nearUsername);
+                const CONTRACT_ID = "v1.social08.testnet";
+                const contract = new near.Contract(account, CONTRACT_ID, {
+                  changeMethods: ["set"],
+                  viewMethods: ["get"],
+                });
+                const result = await contract.set({
+                  args: {
+                    data: {
+                      [`${this.nearUsername}`]: {
+                        profile: {
+                          about: profileUpdate.about,
+                        },
+                      },
+                    },
+                  },
+                  gas: "300000000000000",
+                  amount: "1000000000000000000000000",
+                });
+                ctx.reply(
+                  "Profile about updated successfully 🚀",
+                  this.viewUpdateProfile()
+                );
+              } catch (error) {
+                console.log(error);
+                ctx.reply("An error occured while updating your profile about");
+              }
             });
           });
 
@@ -279,6 +309,36 @@ class BotController {
                 twitter: ctx.match[1],
               };
               console.log(profileUpdate);
+              try {
+                const account = await connection.account(this.nearUsername);
+                const CONTRACT_ID = "v1.social08.testnet";
+                const contract = new near.Contract(account, CONTRACT_ID, {
+                  changeMethods: ["set"],
+                  viewMethods: ["get"],
+                });
+                const result = await contract.set({
+                  args: {
+                    data: {
+                      [`${this.nearUsername}`]: {
+                        profile: {
+                          twitter: profileUpdate.twitter,
+                        },
+                      },
+                    },
+                  },
+                  gas: "300000000000000",
+                  amount: "1000000000000000000000000",
+                });
+                ctx.reply(
+                  "Profile twitter handle updated successfully 🚀",
+                  this.viewUpdateProfile()
+                );
+              } catch (error) {
+                console.log(error);
+                ctx.reply(
+                  "An error occured while updating your profile twitter handle"
+                );
+              }
             });
           });
 
@@ -291,6 +351,37 @@ class BotController {
                 telegram: ctx.match[1],
               };
               console.log(profileUpdate);
+
+              try {
+                const account = await connection.account(this.nearUsername);
+                const CONTRACT_ID = "v1.social08.testnet";
+                const contract = new near.Contract(account, CONTRACT_ID, {
+                  changeMethods: ["set"],
+                  viewMethods: ["get"],
+                });
+                const result = await contract.set({
+                  args: {
+                    data: {
+                      [`${this.nearUsername}`]: {
+                        profile: {
+                          telegram: profileUpdate.telegram,
+                        },
+                      },
+                    },
+                  },
+                  gas: "300000000000000",
+                  amount: "1000000000000000000000000",
+                });
+                ctx.reply(
+                  "Profile telegram handle updated successfully 🚀",
+                  this.viewUpdateProfile()
+                );
+              } catch (error) {
+                console.log(error);
+                ctx.reply(
+                  "An error occured while updating your profile telegram handle"
+                );
+              }
             });
           });
 
@@ -306,6 +397,37 @@ class BotController {
                 const filePath = fileURL.href;
 
                 console.log(filePath);
+
+                try {
+                  const account = await connection.account(this.nearUsername);
+                  const CONTRACT_ID = "v1.social08.testnet";
+                  const contract = new near.Contract(account, CONTRACT_ID, {
+                    changeMethods: ["set"],
+                    viewMethods: ["get"],
+                  });
+                  const result = await contract.set({
+                    args: {
+                      data: {
+                        [`${this.nearUsername}`]: {
+                          image: {
+                            name: filePath,
+                          },
+                        },
+                      },
+                    },
+                    gas: "300000000000000",
+                    amount: "1000000000000000000000000",
+                  });
+                  ctx.reply(
+                    "Profile image updated successfully 🚀",
+                    this.viewUpdateProfile()
+                  );
+                } catch (error) {
+                  console.log(error);
+                  ctx.reply(
+                    "An error occured while updating your profile image"
+                  );
+                }
               } else {
                 ctx.reply("Please upload a valid image");
               }
