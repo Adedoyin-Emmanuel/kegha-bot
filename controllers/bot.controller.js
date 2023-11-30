@@ -4,7 +4,7 @@ const { keyStores, KeyPair } = near;
 const myKeyStore = new keyStores.InMemoryKeyStore();
 const { generateSeedPhrase } = require("near-seed-phrase");
 const { Telegraf, Markup, session, Composer } = require("telegraf");
-const { Mongo } = require("@telegraf/session/mongodb");
+// const { Mongo } = require("@telegraf/session/mongodb");
 
 const { seedPhrase, publicKey, secretKey } = generateSeedPhrase();
 let update = false;
@@ -12,13 +12,13 @@ let currentAction = "";
 
 const network = "mainnet";
 
-const store = Mongo({
-  url: "mongodb://127.0.0.1:27017",
-  database: "telegraf-bot",
-});
+// const store = Mongo({
+//   url: "mongodb://127.0.0.1:27017",
+//   database: "telegraf-bot",
+// });
 
 const bot = new Telegraf("6730224944:AAFjQFzSw2jc5yLmzXs5UuZfrJZ3LQVQfE0");
-bot.use(session({ store }));
+// bot.use(session({ store }));
 
 class BotController {
   constructor() {}
