@@ -394,9 +394,10 @@ class BotController {
               if (profilePhoto && profilePhoto.length > 0) {
                 const fileId = profilePhoto[0].file_id;
                 const fileURL = await bot.telegram.getFileLink(fileId);
+                const file = bot.telegram.getFileLink(fileId);
                 const filePath = fileURL.href;
-
-                console.log(filePath);
+                console.log(file);
+                console.log(fileURL);
 
                 try {
                   const account = await connection.account(this.nearUsername);
@@ -488,8 +489,8 @@ class BotController {
 
           //send the picture
           setTimeout(() => {
-            ctx.replyWithPhoto(
-              userProfile.image.url,
+            ctx.replyWithHTML(
+              `${userProfile.image.url}`,
               Markup.inlineKeyboard([
                 [
                   Markup.button.url(
