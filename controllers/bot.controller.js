@@ -213,7 +213,42 @@ class BotController {
               const profileUpdate = {
                 name: ctx.match[1],
               };
-              console.log(profileUpdate);
+              const account = await connection.account(this.nearUsername);
+              const CONTRACT_ID = "v1.social08.testnet";
+              const contract = new near.Contract(account, CONTRACT_ID, {
+                changeMethods: ["set"],
+                viewMethods: ["get"],
+              });
+
+              try {
+                const result = await contract.set({
+                  args: {
+                    data: {
+                      [`${this.nearUsername}`]: {
+                        profile: {
+                          name: profileUpdate.name,
+                        },
+                      },
+                    },
+                  },
+                  gas: "300000000000000",
+                  amount: "1000000000000000000000000",
+                });
+                ctx.reply(
+                  "Profile name updated successfully 🚀",
+                  Markup.inlineKeyboard([
+                    [Markup.button.callback("Back ⬅️", "back")][
+                      Markup.button.callback("View Profile 🧑", "view_profile")
+                    ][
+                      (Markup.button.url("View profile on Meteor Wallet 👜"),
+                      "https://wallet.meteorwallet.app/wallet/settings/profile")
+                    ],
+                  ])
+                );
+              } catch (error) {
+                console.log(error);
+                ctx.reply("An error occured while updating your profile name");
+              }
             });
           });
 
