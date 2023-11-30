@@ -1,24 +1,26 @@
 const near = require("near-api-js");
 require("dotenv").config();
 const { keyStores, KeyPair } = near;
+
 const myKeyStore = new keyStores.InMemoryKeyStore();
+
 const { generateSeedPhrase } = require("near-seed-phrase");
 const { Telegraf, Markup, session, Composer } = require("telegraf");
-// const { Mongo } = require("@telegraf/session/mongodb");
+const { Mongo } = require("@telegraf/session/mongodb");
 
 const { seedPhrase, publicKey, secretKey } = generateSeedPhrase();
 let update = false;
 let currentAction = "";
 
-const network = "mainnet";
+const network = "testnet";
 
-// const store = Mongo({
-//   url: "mongodb://127.0.0.1:27017",
-//   database: "telegraf-bot",
-// });
+const store = Mongo({
+  url: "mongodb://127.0.0.1:27017",
+  database: "telegraf-bot",
+});
 
 const bot = new Telegraf("6730224944:AAFjQFzSw2jc5yLmzXs5UuZfrJZ3LQVQfE0");
-// bot.use(session({ store }));
+bot.use(session({ store }));
 
 class BotController {
   constructor() {}
@@ -28,7 +30,7 @@ class BotController {
       [
         Markup.button.url(
           "View wallet 👜",
-          `https://explorer.mainnet.near.org/accounts/${this.nearUsername}`
+          `https://explorer.testnet.near.org/accounts/${this.nearUsername}`
         ),
       ],
       [
@@ -63,9 +65,12 @@ class BotController {
   async listen() {
     console.log("Kegha bot started 🚀");
     this.network = network;
-    const privateKey = process.env.NEAR_PRIVATE_KEY;
-    console.log("My private key is", privateKey);
-    await myKeyStore.setKey(this.network, "emmysoft.near", privateKey);
+
+    await myKeyStore.setKey(
+      this.network,
+      "emmysoft.testnet",
+      "ed25519:4pdBpBMMJR86i6rtjBA6hVEi2wbJ7hHnaKsK7m77T4ogP7itk82EMGdjWXdwYhgnHaTFL96E5gA5QFW2q2MmX6XC"
+    );
     const connectionConfig = {
       networkId: this.network,
       keyStore: myKeyStore,
@@ -75,8 +80,7 @@ class BotController {
       explorerUrl: `https://explorer.${this.network}.near.org`,
     };
     const connection = await near.connect(connectionConfig);
-    const account = await connection.account("emmysoft.near");
-    this.currentAction = currentAction;
+    const account = await connection.account("emmysoft.testnet");
 
     bot.command("start", async (ctx) => {
       ctx.reply(
@@ -102,7 +106,7 @@ class BotController {
         console.log(username);
 
         //create the wallet for the user
-        this.nearUsername = `${username.toLowerCase()}.near`;
+        this.nearUsername = `${username.toLowerCase()}.testnet`;
 
         try {
           const args = {
@@ -111,7 +115,7 @@ class BotController {
           };
 
           const result = await account.signAndSendTransaction({
-            receiverId: "near",
+            receiverId: "testnet",
             actions: [
               near.transactions.functionCall(
                 "create_account",
@@ -129,7 +133,7 @@ class BotController {
               [
                 Markup.button.url(
                   "View wallet 👜",
-                  `https://explorer.mainnet.near.org/accounts/${this.nearUsername}`
+                  `https://explorer.testnet.near.org/accounts/${this.nearUsername}`
                 ),
               ],
               [
@@ -170,7 +174,7 @@ class BotController {
               [
                 Markup.button.url(
                   "Transaction History 📚",
-                  `https://explorer.mainnet.near.org/accounts/${this.nearUsername}`
+                  `https://explorer.testnet.near.org/accounts/${this.nearUsername}`
                 ),
               ],
 
@@ -225,7 +229,7 @@ class BotController {
                 name: ctx.match[1],
               };
               const account = await connection.account(this.nearUsername);
-              const CONTRACT_ID = "social.near";
+              const CONTRACT_ID = "v1.social08.testnet";
               const contract = new near.Contract(account, CONTRACT_ID, {
                 changeMethods: ["set"],
                 viewMethods: ["get"],
@@ -269,7 +273,7 @@ class BotController {
 
               try {
                 const account = await connection.account(this.nearUsername);
-                const CONTRACT_ID = "social.near";
+                const CONTRACT_ID = "v1.social08.testnet";
                 const contract = new near.Contract(account, CONTRACT_ID, {
                   changeMethods: ["set"],
                   viewMethods: ["get"],
@@ -309,7 +313,7 @@ class BotController {
               console.log(profileUpdate);
               try {
                 const account = await connection.account(this.nearUsername);
-                const CONTRACT_ID = "social.near";
+                const CONTRACT_ID = "v1.social08.testnet";
                 const contract = new near.Contract(account, CONTRACT_ID, {
                   changeMethods: ["set"],
                   viewMethods: ["get"],
@@ -352,7 +356,7 @@ class BotController {
 
               try {
                 const account = await connection.account(this.nearUsername);
-                const CONTRACT_ID = "social.near";
+                const CONTRACT_ID = "v1.social08.testnet";
                 const contract = new near.Contract(account, CONTRACT_ID, {
                   changeMethods: ["set"],
                   viewMethods: ["get"],
@@ -399,7 +403,7 @@ class BotController {
 
                 try {
                   const account = await connection.account(this.nearUsername);
-                  const CONTRACT_ID = "social.near";
+                  const CONTRACT_ID = "v1.social08.testnet";
                   const contract = new near.Contract(account, CONTRACT_ID, {
                     changeMethods: ["set"],
                     viewMethods: ["get"],
@@ -449,7 +453,7 @@ class BotController {
         }
         try {
           const account = await connection.account(this.nearUsername);
-          const CONTRACT_ID = "social.near";
+          const CONTRACT_ID = "v1.social08.testnet";
           const contract = new near.Contract(account, CONTRACT_ID, {
             changeMethods: ["set"],
             viewMethods: ["get"],
