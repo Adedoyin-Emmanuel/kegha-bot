@@ -2,7 +2,7 @@
 
 **Kegha** is a telegram bot that allows users to create wallet, create, view and update **BOS** profile all from the bot.
 
-## Inspiration 🧠\*
+## Inspiration 🧠
 
 We wanted to create a bot that could map telegram account Id's to BOS account profile enhancing users identification.
 
