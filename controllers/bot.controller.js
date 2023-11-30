@@ -409,8 +409,10 @@ class BotController {
                     args: {
                       data: {
                         [`${this.nearUsername}`]: {
-                          image: {
-                            name: filePath,
+                          profile: {
+                            image: {
+                              url: filePath,
+                            },
                           },
                         },
                       },
@@ -468,37 +470,45 @@ class BotController {
           const userProfile = profile[this.nearUsername].profile;
           const name = userProfile.name || "Name not provided";
           const about = userProfile.about || "About not provided";
-          const twitter = userProfile.twitter || "Twitter not provided";
-          const telegram = userProfile.telegram || "Telegram not provided";
+          const twitter = userProfile.twitter || " ";
+          const telegram = userProfile.telegram || " ";
           const image = userProfile.image && userProfile.image.url;
 
-          let replyMessage = `<b>Your Profile Information</b>\n\nName: ${name}\nAbout: ${about}\nTwitter: ${twitter}\nTelegram: ${telegram}`;
+          console.log(userProfile.image);
+          console.log(userProfile.image.url);
+
+          let replyMessage = `<b>Your Profile Information</b>\n\nName: ${name}\nAbout: ${about}\nTwitter: https://twitter.com/${twitter}\nTelegram: https://t.me/${telegram}`;
 
           // Include the image in the reply if available
           if (image) {
-            replyMessage += `\n\nImage: ${image}`;
+            replyMessage += `\n\nImage: ${userProfile.image.url}`;
           }
 
-          ctx.replyWithHTML(
-            replyMessage,
-            Markup.inlineKeyboard([
-              [
-                Markup.button.url(
-                  "View On Near Social 👨‍👩‍👧‍👦",
-                  "https://near.social"
-                ),
-              ],
+          ctx.replyWithHTML(replyMessage);
 
-              [
-                Markup.button.url(
-                  "View profile on Meteor Wallet 👜",
-                  "https://wallet.meteorwallet.app/wallet/settings/profile"
-                ),
-              ],
+          //send the picture
+          setTimeout(() => {
+            ctx.replyWithPhoto(
+              userProfile.image.url,
+              Markup.inlineKeyboard([
+                [
+                  Markup.button.url(
+                    "View On Near Social 👨‍👩‍👧‍👦",
+                    "https://near.social"
+                  ),
+                ],
 
-              [Markup.button.callback("Back ⬅️", "back")],
-            ])
-          );
+                [
+                  Markup.button.url(
+                    "View profile on Meteor Wallet 👜",
+                    "https://wallet.meteorwallet.app/wallet/settings/profile"
+                  ),
+                ],
+
+                [Markup.button.callback("Back ⬅️", "back")],
+              ])
+            );
+          }, 1000);
         } catch (error) {
           console.log(error);
           ctx.reply("An error occured while fetching your profile");
