@@ -19,7 +19,7 @@ const network = "testnet";
 //   database: "telegraf-bot",
 // });
 
-const bot = new Telegraf("6730224944:AAFjQFzSw2jc5yLmzXs5UuZfrJZ3LQVQfE0");
+const bot = new Telegraf("");
 // bot.use(session({ store }));
 
 class BotController {
